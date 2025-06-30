@@ -39,6 +39,12 @@
 
 ### 2. 运行设置脚本
 ```bash
+git clone https://github.com/mymindwas/Gensyn-Bot.git
+```
+```bash
+cd Gensyn-Bot
+```
+```bash
 python setup.py
 ```
 
