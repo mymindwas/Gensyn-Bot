@@ -1,0 +1,18 @@
+{
+    "TELEGRAM_API_TOKEN": "your_bot_token_here",
+    "CHAT_ID": "your_chat_id_here",
+    "PEER_NAMES": [
+        {
+            "id": "Qmb14s2Es99SDQ6Fh6kkZkM6359raDgBLdjcYoSk3nxxv7",
+            "remark": "服务器A"
+        },
+        {
+            "id": "QmPboLHehSK3TJYkDskwDW4tFqhJDne8xLiKTiEARMuavj",
+            "remark": "服务器B"
+        },
+        {
+            "id": "0xf26fbD7E4397Cc4BFe35780a3383A9793aae7bBa",
+            "remark": "离线节点"
+        }
+    ]
+}

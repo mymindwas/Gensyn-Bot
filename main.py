@@ -27,29 +27,53 @@ def send_telegram_message(token, chat_id, message: str):
     }
     return requests.post(url, json=payload)
 
-def fetch_peer_data(peer_name):
-    url_name = peer_name.replace(" ", "%20")
-    url = f"https://dashboard.gensyn.ai/api/v1/peer?name={url_name}"
+def fetch_peer_data(peer_info):
+    """获取节点数据，支持id和remark配置"""
+    if isinstance(peer_info, dict):
+        # 新的配置格式：包含id和备注
+        peer_id = peer_info.get("id")
+        remark = peer_info.get("remark", "")
+    else:
+        # 兼容旧格式：只有名称
+        peer_id = None
+        remark = ""
+    
+    # 优先使用id查询，如果没有id则使用name查询（兼容旧格式）
+    if peer_id:
+        url = f"https://dashboard.gensyn.ai/api/v1/peer?id={peer_id}"
+    else:
+        # 兼容旧格式：使用名称查询
+        url_name = peer_info.replace(" ", "%20")
+        url = f"https://dashboard.gensyn.ai/api/v1/peer?name={url_name}"
+    
     try:
         response = requests.get(url)
         if response.ok:
             data = response.json()
+            # 如果使用name查询，需要更新peer_id
+            if not peer_id and "peerId" in data:
+                peer_id = data["peerId"]
+            
             task_manager.update_node_stats(
-                data["peerId"], 
+                peer_id, 
                 data.get("reward", 0), 
                 data.get("score", 0), 
                 data.get("online", False)
             )
+            
+            # 添加备注信息到返回数据
+            data["_remark"] = remark
             return data
     except Exception as e:
         print(f"获取节点数据失败: {str(e)}")
     return None
 
-def format_node_status(name, info, peerno, previous_data=None):
+def format_node_status(info, peerno, previous_data=None):
     peer_id = info["peerId"]
     reward = info.get("reward", 0)
     score = info.get("score", 0)
     online = info.get("online", False)
+    remark = info.get("_remark", "")
     
     # 获取统计数据变化
     stats_changes = task_manager.get_stats_change(peer_id)
@@ -75,7 +99,10 @@ def format_node_status(name, info, peerno, previous_data=None):
     status_icon = "🟢" if online else "🔴"
     change_text = " | " + " | ".join(changes) if changes else ""
     
-    msg = f"<b>{peerno}</b> {status_icon} <code>{name}</code>\n"
+    # 构建显示名称：如果有备注则显示备注，否则显示peer_id前12位
+    display_name = remark if remark else f"Node_{peer_id[:12]}"
+    
+    msg = f"<b>{peerno}</b> {status_icon} <code>{display_name}</code>\n"
     msg += f"R:{reward} | S:{score} | ID:{peer_id[:12]}...{change_text}"
     
     # 添加统计数据趋势
@@ -100,13 +127,13 @@ def query_nodes_status(config, chat_id):
         messages = []
         current_data = {}
 
-        for name in config["PEER_NAMES"]:
-            data = fetch_peer_data(name)
+        for peer_info in config["PEER_NAMES"]:
+            data = fetch_peer_data(peer_info)
             if data:
                 current_data[data["peerId"]] = data
 
-        for i, (name, info) in enumerate(current_data.items(), 1):
-            msg = format_node_status(name, info, i)
+        for i, (peer_id, info) in enumerate(current_data.items(), 1):
+            msg = format_node_status(info, i)
             messages.append(msg)
 
         timestamp = datetime.now().strftime("%H:%M:%S")

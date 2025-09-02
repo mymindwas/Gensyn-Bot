@@ -34,11 +34,32 @@ def get_monitoring_config():
     print("\n📊 配置监控参数")
     print("-" * 30)
     
-    print("请输入节点名称（用逗号分隔）:")
-    print("示例: loud sleek bat, knobby leaping kangaroo")
-    names = input("节点名称: ").strip().split(",")
+    print("请输入节点信息（支持两种格式）：")
+    print("格式1 - 简单名称: loud sleek bat")
+    print("格式2 - 详细信息: id,备注")
+    print("示例: Qmb14s2Es99SDQ6Fh6kkZkM6359raDgBLdjcYoSk3nxxv7,服务器A")
+    print("用逗号分隔多个节点")
+    
+    nodes_input = input("节点信息: ").strip()
+    nodes = [node.strip() for node in nodes_input.split(",") if node.strip()]
+    
     config = {}
-    config["PEER_NAMES"] = [name.strip() for name in names if name.strip()]
+    peer_names = []
+    
+    for i in range(0, len(nodes), 2):
+        if i + 1 < len(nodes):
+            # 完整信息：id, remark
+            peer_id = nodes[i]
+            remark = nodes[i + 1]
+            peer_names.append({
+                "id": peer_id,
+                "remark": remark
+            })
+        else:
+            # 只有名称（兼容旧格式）
+            peer_names.append(nodes[i])
+    
+    config["PEER_NAMES"] = peer_names
     
     return config
 

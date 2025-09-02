@@ -39,19 +39,35 @@
 
 ### 2. 运行设置脚本
 ```bash
-git clone https://github.com/mymindwas/Gensyn-Bot.git
-```
-```bash
-cd Gensyn-Bot
-```
-```bash
 python setup.py
 ```
 
 按提示输入：
 - **Bot Token**: 从 BotFather 获得的 Token
 - **Chat ID**: 你的聊天 ID
-- **节点名称**: 用逗号分隔的节点名称列表
+- **节点信息**: 支持两种格式
+
+#### 节点配置格式
+
+**格式1 - 简单名称（兼容旧版本）:**
+```
+loud sleek bat, knobby leaping kangaroo
+```
+
+**格式2 - 详细信息（推荐，更准确）:**
+```
+Qmb14s2Es99SDQ6Fh6kkZkM6359raDgBLdjcYoSk3nxxv7,服务器A
+QmPboLHehSK3TJYkDskwDW4tFqhJDne8xLiKTiEARMuavj,服务器B
+```
+
+**格式说明：**
+- 第一列：节点ID（Peer ID）- 用于准确查询在线状态
+- 第二列：备注信息 - 用于标识对应的服务器
+
+**为什么使用ID查询更准确？**
+- 使用 `name` 参数查询可能返回不准确的结果
+- 使用 `id` 参数查询能获得最准确的节点状态
+- 建议优先使用ID进行配置
 
 ### 3. 启动机器人
 ```bash
@@ -96,11 +112,30 @@ R:45 | S:120 | ID:QmX5RDyKC4s... | 🔴离线
 ### 配置文件
 配置信息保存在 `config.json` 文件中：
 
+#### 旧格式（兼容）:
 ```json
 {
     "TELEGRAM_API_TOKEN": "your_bot_token_here",
     "CHAT_ID": "your_chat_id_here",
     "PEER_NAMES": ["loud sleek bat", "knobby leaping kangaroo"]
+}
+```
+
+#### 新格式（推荐）:
+```json
+{
+    "TELEGRAM_API_TOKEN": "your_bot_token_here",
+    "CHAT_ID": "your_chat_id_here",
+    "PEER_NAMES": [
+        {
+            "id": "Qmb14s2Es99SDQ6Fh6kkZkM6359raDgBLdjcYoSk3nxxv7",
+            "remark": "服务器A"
+        },
+        {
+            "id": "QmPboLHehSK3TJYkDskwDW4tFqhJDne8xLiKTiEARMuavj",
+            "remark": "服务器B"
+        }
+    ]
 }
 ```
 
