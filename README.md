@@ -170,6 +170,26 @@ R:45 | S:120 | ID:QmX5RDyKC4s... | 🔴离线
 - 确认节点名称是否正确
 - 检查 Gensyn 仪表板是否可访问
 
+#### 4. json文件损坏
+Traceback (most recent call last):
+  File "/root/GENSYNBOT/main.py", line 11, in <module>
+    task_manager = NodeTaskManager()
+  File "/root/GENSYNBOT/node_tasks.py", line 10, in __init__
+    self.load_tasks()
+  File "/root/GENSYNBOT/node_tasks.py", line 15, in load_tasks
+    data = json.load(f)
+  File "/usr/lib/python3.10/json/__init__.py", line 293, in load
+    return loads(fp.read(),
+  File "/usr/lib/python3.10/json/__init__.py", line 346, in loads
+    return _default_decoder.decode(s)
+  File "/usr/lib/python3.10/json/decoder.py", line 337, in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+  File "/usr/lib/python3.10/json/decoder.py", line 353, in raw_decode
+    obj, end = self.scan_once(s, idx)
+json.decoder.JSONDecodeError: Expecting ',' delimiter: line 8454 column 11 (char 266240)
+- 使用该指令删除以下文件即可：
+rm -f /root/GENSYNBOT/node_tasks.json
+
 ### 调试模式
 运行测试脚本来验证 API 连接：
 
@@ -211,5 +231,6 @@ nohup python main.py > bot.log 2>&1 &
 ```
 
 ---
+
 
 **注意**: 请确保你的 Bot Token 和 Chat ID 安全，不要分享给他人。 
